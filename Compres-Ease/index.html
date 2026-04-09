@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShrinkIt | Professional File Compressor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .app-shell {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 2.5rem;
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .compress-zone {
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .compress-zone.active {
+            border-color: #8b5cf6;
+            background: #f5f3ff;
+            transform: scale(0.98);
+        }
+        .action-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            transition: all 0.3s ease;
+        }
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+        .file-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #8b5cf6;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell flex flex-col h-[85vh] md:h-auto md:min-h-[600px]">
+        <div class="p-6 pb-4 glass-header sticky top-0 z-10 border-b border-slate-50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-extrabold text-slate-900 leading-none">ShrinkIt</h1>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Real Compressor</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-grow scrollbar-hide">
+            <div id="dropZone" class="compress-zone rounded-[2rem] p-8 flex flex-col items-center justify-center text-center cursor-pointer mb-6">
+                <input type="file" id="fileInput" class="hidden" multiple accept="image/jpeg,image/png,image/webp">
+                <div class="w-14 h-14 bg-violet-50 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                </div>
+                <h3 class="text-sm font-bold text-slate-700">Drop images here</h3>
+                <p class="text-[11px] text-slate-400 mt-1">JPEG, PNG, WEBP (True Compression)</p>
+            </div>
+
+            <div id="settings" class="hidden mb-6 bg-slate-50 p-5 rounded-3xl border border-slate-100 shadow-inner">
+                <div class="flex justify-between items-center mb-4">
+                    <label class="text-[11px] font-black uppercase text-slate-400 tracking-wider">Compression Intensity</label>
+                    <span id="levelDisplay" class="text-xs font-bold text-white bg-violet-600 px-3 py-1 rounded-full">High</span>
+                </div>
+                <input type="range" id="compLevel" min="5" max="95" value="70">
+                <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500">
+                    <span>BETTER QUALITY</span>
+                    <span>SMALLER SIZE</span>
+                </div>
+            </div>
+
+            <div id="fileList" class="space-y-3"></div>
+        </div>
+
+        <div class="p-6 glass-header border-t border-slate-50">
+            <button id="shrinkBtn" class="action-btn w-full text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 disabled:opacity-30 disabled:grayscale transition-all shadow-xl" disabled>
+                <span>Shrink & Download</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 bg-slate-900 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl transition-all duration-300 translate-y-20 opacity-0">
+        Compression Successful!
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const settings = document.getElementById('settings');
+        const shrinkBtn = document.getElementById('shrinkBtn');
+        const compLevel = document.getElementById('compLevel');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const toast = document.getElementById('toast');
+
+        let selectedFiles = [];
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFiles(e.target.files);
+
+        ['dragenter', 'dragover'].forEach(n => dropZone.addEventListener(n, (e) => { e.preventDefault(); dropZone.classList.add('active'); }));
+        ['dragleave', 'drop'].forEach(n => dropZone.addEventListener(n, (e) => { e.preventDefault(); dropZone.classList.remove('active'); if(n==='drop') handleFiles(e.dataTransfer.files); }));
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            if (selectedFiles.length > 0) {
+                renderFileList();
+                settings.classList.remove('hidden');
+                shrinkBtn.disabled = false;
+            }
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = selectedFiles.map((file, i) => {
+                const size = (file.size / 1024 / 1024).toFixed(2);
+                return `
+                    <div class="file-card bg-white p-4 rounded-[1.8rem] border border-slate-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3 overflow-hidden text-left">
+                                <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center shrink-0 text-violet-500 font-bold text-[10px] uppercase">IMG</div>
+                                <div class="overflow-hidden">
+                                    <p class="text-[13px] font-bold text-slate-800 truncate">${file.name}</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Original: ${size} MB</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="res-${i}" class="hidden p-3 bg-green-50 rounded-2xl border border-green-100 flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-black uppercase text-green-500 tracking-wider">Final Size</span>
+                                <span id="finalSize-${i}" class="text-[14px] font-extrabold text-green-700 leading-none">-- MB</span>
+                            </div>
+                            <span id="saveBadge-${i}" class="bg-green-600 text-white px-2 py-1 rounded-lg text-[10px] font-black italic">SAVED --%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function compressImage(file, quality) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Maintain aspect ratio
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // The actual compression happens here by reducing quality (0.0 to 1.0)
+                        // quality is inverted from our slider (max compression = low quality value)
+                        const qValue = 1 - (quality / 100);
+                        
+                        canvas.toBlob((blob) => {
+                            resolve(blob);
+                        }, 'image/jpeg', Math.max(0.1, qValue));
+                    };
+                };
+            });
+        }
+
+        shrinkBtn.onclick = async () => {
+            shrinkBtn.disabled = true;
+            const quality = parseInt(compLevel.value);
+            const zip = new JSZip();
+            const compressedBlobs = [];
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const resDiv = document.getElementById(`res-${i}`);
+                const finalSizeSpan = document.getElementById(`finalSize-${i}`);
+                const saveBadge = document.getElementById(`saveBadge-${i}`);
+
+                // Real Compression
+                const compressedBlob = await compressImage(file, quality);
+                compressedBlobs.push({ blob: compressedBlob, name: file.name });
+
+                // UI Update with real numbers
+                resDiv.classList.remove('hidden');
+                const newSizeMB = (compressedBlob.size / 1024 / 1024).toFixed(2);
+                const savePercent = Math.round(((file.size - compressedBlob.size) / file.size) * 100);
+                
+                finalSizeSpan.innerText = `${newSizeMB} MB`;
+                saveBadge.innerText = `SAVED ${savePercent}%`;
+                
+                zip.file(`shrunk_${file.name.split('.')[0]}.jpg`, compressedBlob);
+            }
+
+            // Download
+            if (selectedFiles.length > 1) {
+                const content = await zip.generateAsync({ type: "blob" });
+                downloadBlob(content, `shrunk_images_${Date.now()}.zip`);
+            } else {
+                const item = compressedBlobs[0];
+                downloadBlob(item.blob, `shrunk_${item.name.split('.')[0]}.jpg`);
+            }
+
+            showToast();
+            shrinkBtn.disabled = false;
+        };
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        compLevel.oninput = (e) => {
+            const val = parseInt(e.target.value);
+            if (val < 30) levelDisplay.innerText = "Low";
+            else if (val < 70) levelDisplay.innerText = "Medium";
+            else levelDisplay.innerText = "Extreme";
+        };
+
+        function showToast() {
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

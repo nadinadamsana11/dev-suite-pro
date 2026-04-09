@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Hub Pro | Central Management Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(88, 28, 135, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .glass-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+        .status-badge {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+        .category-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="p-6 md:p-16">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Dashboard Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-20 gap-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="px-3 py-1 rounded-full status-badge text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Production Ready
+                    </div>
+                </div>
+                <h1 class="text-6xl font-black tracking-tighter leading-none">
+                    Dev<span class="text-indigo-500">Suite</span>.
+                </h1>
+                <p class="text-slate-400 text-lg font-medium max-w-xl">
+                    A centralized ecosystem for high-performance web utilities and professional tools.
+                </p>
+            </div>
+            <div class="flex flex-col items-end">
+                <div class="text-right">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Last Deployment</p>
+                    <p class="text-xl font-mono font-bold text-slate-300">2026.04.09</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="app-grid">
+            <!-- App cards will be injected here -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">© 2026 Professional Portfolio Hub</p>
+            <div class="flex gap-8">
+                <span class="text-slate-600 text-xs font-bold uppercase cursor-help hover:text-indigo-400 transition-colors">Documentation</span>
+                <span class="text-slate-600 text-xs font-bold uppercase cursor-help hover:text-indigo-400 transition-colors">System Status</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const apps = [
+            { 
+                name: 'Utility Hub Pro', 
+                folder: 'Utility-Hub-Pro', 
+                icon: '🛠️', 
+                category: 'System',
+                description: 'All-in-one desktop utility kit for managing system tasks and workflows efficiently.'
+            },
+            { 
+                name: 'Tech Master Fix', 
+                folder: 'Tech-Master-Fix', 
+                icon: '🔧', 
+                category: 'Technical',
+                description: 'Advanced troubleshooting and technical repair assistant for hardware and software diagnostics.'
+            },
+            { 
+                name: 'UI-UX Kit Pro', 
+                folder: 'UI-UX-Kit-Pro', 
+                icon: '🎨', 
+                category: 'Design',
+                description: 'A comprehensive design system and component library for rapid user interface prototyping.'
+            },
+            { 
+                name: 'Study Flow Pro', 
+                folder: 'Study-Flow-Pro', 
+                icon: '📚', 
+                category: 'Education',
+                description: 'Smart learning management tool designed to optimize student focus and curriculum tracking.'
+            },
+            { 
+                name: 'Interview Pro', 
+                folder: 'Interview-Pro', 
+                icon: '🤝', 
+                category: 'Career',
+                description: 'Interactive interview preparation platform with real-world scenarios and feedback systems.'
+            },
+            { 
+                name: 'Expert Directory', 
+                folder: 'Expert-Directory', 
+                icon: '📂', 
+                category: 'Networking',
+                description: 'High-speed database for professional contacts and expert service provider listings.'
+            },
+            { 
+                name: 'Compres-Ease', 
+                folder: 'Compres-Ease', 
+                icon: '📦', 
+                category: 'Utility',
+                description: 'Lossless file compression engine for optimizing assets without compromising quality.'
+            },
+            { 
+                name: 'Convert-Ease', 
+                folder: 'Convert-Ease', 
+                icon: '🔄', 
+                category: 'Utility',
+                description: 'Multi-format file conversion tool supporting PDF, Images, and Documents instantly.'
+            },
+            { 
+                name: 'Card Expert', 
+                folder: 'Card-Expert', 
+                icon: '💳', 
+                category: 'Finance',
+                description: 'Professional credit card comparison and rewards optimization engine for travelers.'
+            },
+            { 
+                name: 'Crypto Profit', 
+                folder: 'Crypto-Profit-Calculator', 
+                icon: '🪙', 
+                category: 'Finance',
+                description: 'Real-time crypto trade analysis tool with ROI tracking and break-even calculations.'
+            },
+            { 
+                name: 'Loan EMI Calc', 
+                folder: 'Loan-EMI-Calculator', 
+                icon: '💰', 
+                category: 'Finance',
+                description: 'Precision financial calculator for personal, home, and professional loan amortizations.'
+            }
+        ];
+
+        const grid = document.getElementById('app-grid');
+
+        apps.forEach(app => {
+            const card = document.createElement('a');
+            card.href = `./${app.folder}/index.html`;
+            card.className = 'glass-card p-8 rounded-[3rem] flex flex-col group relative overflow-hidden';
+            
+            card.innerHTML = `
+                <!-- Decorative background blur -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-600/10 rounded-full blur-3xl group-hover:bg-indigo-600/20 transition-all"></div>
+                
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-3xl shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                        ${app.icon}
+                    </div>
+                    <span class="px-3 py-1 rounded-full category-pill text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        ${app.category}
+                    </span>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-2xl font-extrabold tracking-tight group-hover:text-indigo-400 transition-colors">
+                        ${app.name}
+                    </h3>
+                    <p class="text-slate-500 text-sm leading-relaxed font-medium">
+                        ${app.description}
+                    </p>
+                </div>
+
+                <div class="mt-10 pt-6 border-t border-white/5 flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">Status</span>
+                        <span class="text-xs font-bold text-green-500 tracking-tight">Active Node</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-indigo-600/10 flex items-center justify-center group-hover:bg-indigo-600 transition-all duration-300">
+                        <svg class="w-5 h-5 text-white transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>

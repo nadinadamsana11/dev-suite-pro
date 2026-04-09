@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UtilityHub Pro | Essential Web Utilities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+        .app-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.05);
+        }
+        .nav-tab {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+        .tool-content {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Range Slider */
+        input[type=range] {
+            accent-color: var(--primary);
+        }
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-12">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Dashboard Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">UtilityHub <span class="text-indigo-600">Pro</span></h1>
+                <p class="text-slate-500 font-medium">Professional grade tools for everyday tasks.</p>
+            </div>
+            <div class="flex items-center gap-3 bg-white/50 p-2 rounded-2xl border border-white">
+                <span id="current-time" class="text-sm font-mono font-bold px-3 py-1 bg-white rounded-lg shadow-sm">00:00:00</span>
+            </div>
+        </header>
+
+        <!-- Sidebar-style Navigation for Mobile & Desktop -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Navigation -->
+            <nav class="lg:col-span-3 flex lg:flex-col gap-2 overflow-x-auto no-scrollbar p-1 bg-slate-200/50 rounded-3xl lg:h-fit">
+                <button onclick="switchTab('unit')" id="tab-unit" class="nav-tab active flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-sm w-full whitespace-nowrap">
+                    <span>📏</span> Unit Converter
+                </button>
+                <button onclick="switchTab('pass')" id="tab-pass" class="nav-tab flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-sm w-full whitespace-nowrap text-slate-500">
+                    <span>🔐</span> Pass Generator
+                </button>
+                <button onclick="switchTab('bmi')" id="tab-bmi" class="nav-tab flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-sm w-full whitespace-nowrap text-slate-500">
+                    <span>⚖️</span> BMI Calculator
+                </button>
+                <button onclick="switchTab('note')" id="tab-note" class="nav-tab flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold text-sm w-full whitespace-nowrap text-slate-500">
+                    <span>📝</span> Smart Notes
+                </button>
+            </nav>
+
+            <!-- Main App Area -->
+            <main class="lg:col-span-9">
+                <div class="app-card p-8 md:p-12 min-h-[500px]">
+                    
+                    <!-- Unit Converter -->
+                    <section id="tool-unit" class="tool-content">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold">Unit Converter</h2>
+                            <p class="text-slate-400 text-sm">Convert length and weight instantly.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Input Value</label>
+                                <input type="number" id="unit-val" value="1" class="w-full bg-slate-50 p-5 rounded-2xl border-2 border-transparent focus:border-indigo-500 outline-none text-xl font-bold transition">
+                                <select id="unit-type" onchange="convertUnits()" class="w-full bg-slate-50 p-5 rounded-2xl border-2 border-transparent focus:border-indigo-500 outline-none font-bold">
+                                    <option value="length">Length (Meters)</option>
+                                    <option value="weight">Weight (Kilograms)</option>
+                                </select>
+                            </div>
+                            <div id="unit-output" class="grid grid-cols-1 gap-4">
+                                <!-- Dynamic Output -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Password Generator -->
+                    <section id="tool-pass" class="tool-content hidden">
+                        <div class="mb-8 text-center">
+                            <h2 class="text-2xl font-bold">Secure Password Gen</h2>
+                            <p class="text-slate-400 text-sm">Generate unbreakable passwords locally.</p>
+                        </div>
+                        <div class="max-w-md mx-auto space-y-8">
+                            <div class="relative group">
+                                <div id="pass-display" class="w-full bg-indigo-50 p-6 rounded-3xl text-center text-2xl font-mono font-bold text-indigo-600 border-2 border-dashed border-indigo-200">
+                                    Click Generate
+                                </div>
+                                <button onclick="copyToClipboard()" class="absolute top-2 right-2 p-2 bg-white rounded-xl shadow-md hover:scale-110 transition active:scale-95">📋</button>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex justify-between font-bold text-sm">
+                                    <span>Strength Length</span>
+                                    <span id="len-label" class="text-indigo-600 text-lg">16</span>
+                                </div>
+                                <input type="range" id="pass-len" min="8" max="40" value="16" class="w-full h-3 bg-slate-200 rounded-full appearance-none cursor-pointer" oninput="updatePassLen(this.value)">
+                                <button onclick="generatePassword()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition">Generate Key</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- BMI Calculator -->
+                    <section id="tool-bmi" class="tool-content hidden">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold">Body Mass Index</h2>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-12 items-center">
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-400 uppercase">Height (cm)</label>
+                                    <input type="number" id="bmi-h" placeholder="175" class="w-full bg-slate-100 p-4 rounded-xl outline-none focus:ring-2 ring-indigo-500">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-xs font-bold text-slate-400 uppercase">Weight (kg)</label>
+                                    <input type="number" id="bmi-w" placeholder="70" class="w-full bg-slate-100 p-4 rounded-xl outline-none focus:ring-2 ring-indigo-500">
+                                </div>
+                                <button onclick="calculateBMI()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">Calculate Results</button>
+                            </div>
+                            <div id="bmi-result-box" class="hidden p-8 rounded-3xl text-center space-y-2">
+                                <span class="text-sm font-bold uppercase opacity-60">Your Result</span>
+                                <h3 id="bmi-score" class="text-6xl font-black">22.4</h3>
+                                <p id="bmi-status" class="text-xl font-bold italic"></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Smart Notes -->
+                    <section id="tool-note" class="tool-content hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">Cloud-less Notes</h2>
+                            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">AUTO-SAVING</span>
+                        </div>
+                        <textarea id="note-pad" class="w-full h-80 bg-slate-50 p-8 rounded-3xl outline-none border-2 border-transparent focus:border-indigo-100 text-lg leading-relaxed" placeholder="Type your thoughts here... everything is saved to your browser instantly."></textarea>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+
+        <footer class="mt-20 border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center text-slate-400 text-xs font-bold uppercase tracking-widest gap-4">
+            <p>&copy; 2026 UtilityHub Digital Systems</p>
+            <div class="flex gap-6">
+                <span>Privacy First</span>
+                <span>Zero Latency</span>
+                <span>Open Source</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- UI Logic -->
+    <script>
+        // Tab Management
+        function switchTab(tabId) {
+            document.querySelectorAll('.tool-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('active', 'text-indigo-600');
+                el.classList.add('text-slate-500');
+            });
+
+            document.getElementById('tool-' + tabId).classList.remove('hidden');
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.add('active', 'text-indigo-600');
+            activeTab.classList.remove('text-slate-500');
+        }
+
+        // Live Clock
+        setInterval(() => {
+            document.getElementById('current-time').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        // Unit Converter Logic
+        const unitVal = document.getElementById('unit-val');
+        const unitType = document.getElementById('unit-type');
+        const unitOut = document.getElementById('unit-output');
+
+        function convertUnits() {
+            const val = parseFloat(unitVal.value) || 0;
+            const type = unitType.value;
+            let results = [];
+
+            if(type === 'length') {
+                results = [
+                    { label: 'Feet', val: (val * 3.28084).toFixed(2) },
+                    { label: 'Inches', val: (val * 39.3701).toFixed(2) },
+                    { label: 'Kilometers', val: (val / 1000).toFixed(4) },
+                    { label: 'Miles', val: (val / 1609.34).toFixed(4) }
+                ];
+            } else {
+                results = [
+                    { label: 'Pounds', val: (val * 2.20462).toFixed(2) },
+                    { label: 'Ounces', val: (val * 35.274).toFixed(2) },
+                    { label: 'Grams', val: (val * 1000).toLocaleString() },
+                    { label: 'Tons (Metric)', val: (val / 1000).toFixed(4) }
+                ];
+            }
+
+            unitOut.innerHTML = results.map(r => `
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <span class="text-xs font-bold text-slate-400 uppercase">${r.label}</span>
+                    <span class="text-lg font-black text-indigo-600">${r.val}</span>
+                </div>
+            `).join('');
+        }
+        unitVal.addEventListener('input', convertUnits);
+        window.onload = convertUnits;
+
+        // Password Generator Logic
+        function updatePassLen(v) { document.getElementById('len-label').innerText = v; }
+        
+        function generatePassword() {
+            const length = document.getElementById('pass-len').value;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+            let retVal = "";
+            for (let i = 0, n = charset.length; i < length; ++i) {
+                retVal += charset.charAt(Math.floor(Math.random() * n));
+            }
+            document.getElementById('pass-display').innerText = retVal;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('pass-display').innerText;
+            const elem = document.createElement('textarea');
+            elem.value = text;
+            document.body.appendChild(elem);
+            elem.select();
+            document.execCommand('copy');
+            document.body.removeChild(elem);
+        }
+
+        // BMI Logic
+        function calculateBMI() {
+            const h = document.getElementById('bmi-h').value / 100;
+            const w = document.getElementById('bmi-w').value;
+            if(!h || !w) return;
+            
+            const bmi = (w / (h * h)).toFixed(1);
+            const box = document.getElementById('bmi-result-box');
+            const score = document.getElementById('bmi-score');
+            const status = document.getElementById('bmi-status');
+
+            box.classList.remove('hidden');
+            score.innerText = bmi;
+
+            if(bmi < 18.5) {
+                status.innerText = "Underweight";
+                box.className = "p-8 rounded-3xl text-center space-y-2 bg-amber-50 text-amber-600";
+            } else if(bmi < 25) {
+                status.innerText = "Healthy Range";
+                box.className = "p-8 rounded-3xl text-center space-y-2 bg-emerald-50 text-emerald-600";
+            } else {
+                status.innerText = "Overweight";
+                box.className = "p-8 rounded-3xl text-center space-y-2 bg-rose-50 text-rose-600";
+            }
+        }
+
+        // Note Logic
+        const notePad = document.getElementById('note-pad');
+        notePad.value = localStorage.getItem('hub_notes') || "";
+        notePad.addEventListener('input', (e) => {
+            localStorage.setItem('hub_notes', e.target.value);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyFlow | Career & Learning Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfcfd;
+            color: #0f172a;
+        }
+        .guide-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #f1f5f9;
+        }
+        .guide-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px -12px rgba(99, 102, 241, 0.15);
+            border-color: #e0e7ff;
+        }
+        .nav-pill {
+            transition: all 0.3s ease;
+        }
+        .nav-pill.active {
+            background: #6366f1;
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .category-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .prose b { color: #1e293b; font-weight: 700; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen flex flex-col max-w-5xl mx-auto bg-white shadow-2xl overflow-hidden">
+        <!-- App Header -->
+        <header class="sticky top-0 z-50 glass-header px-6 py-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 category-icon rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">StudyFlow Pro</h1>
+                        <p class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Career Success & Learning Guide</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Navigation -->
+            <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="filterCategory('All')" class="nav-pill active shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">All Strategies</button>
+                <button onclick="filterCategory('Resume')" class="nav-pill shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Resume Engineering</button>
+                <button onclick="filterCategory('Interview')" class="nav-pill shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Interview Mastery</button>
+                <button onclick="filterCategory('Network')" class="nav-pill shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Networking</button>
+                <button onclick="filterCategory('Study')" class="nav-pill shrink-0 px-6 py-3 rounded-2xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Study Guides</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-6 md:p-10 bg-slate-50/30">
+            <div id="guideGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Cards injected here -->
+            </div>
+        </main>
+
+        <footer class="p-8 border-t border-slate-50 text-center bg-white">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[6px]">Where Preparation Meets Opportunity • 2026</p>
+        </footer>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl transform transition-all border border-white/20">
+            <div class="p-10">
+                <div id="modalHeader" class="flex items-center gap-4 mb-6"></div>
+                <h2 id="modalTitle" class="text-3xl font-extrabold text-slate-900 mb-6 leading-tight"></h2>
+                <div id="modalContent" class="text-slate-600 leading-relaxed text-base space-y-4 max-h-[50vh] overflow-y-auto pr-4 custom-scrollbar"></div>
+                <button onclick="closeModal()" class="mt-10 w-full bg-slate-900 text-white py-5 rounded-3xl font-bold transition-all hover:bg-indigo-600 shadow-xl shadow-indigo-100">Got it, Let's Execute!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const studyGuides = [
+            // --- RESUME ENGINEERING ---
+            {
+                id: 1, category: 'Resume', title: 'ATS Optimization', icon: '🤖',
+                desc: 'Your resume is a marketing brochure, not a history book.',
+                details: '<b>Keyword Optimization:</b> Mirror terminology from the job description. <b>Format Simplicity:</b> Avoid tables, headers, and complex graphics. <b>File Naming:</b> Always save as "FirstName_LastName_Role.pdf".'
+            },
+            {
+                id: 2, category: 'Resume', title: 'The Professional Profile', icon: '📝',
+                desc: 'The psychological hook that sells the interview.',
+                details: 'Replace "Objective" with a 3-4 line <b>Professional Profile</b>. Define who you are and your biggest achievement. Example: "Results-driven Project Manager delivering $2M+ tech projects 15% under budget."'
+            },
+            {
+                id: 3, category: 'Resume', title: 'Quantifying Impact', icon: '🔢',
+                desc: 'Recruiters hate vague descriptions. Use the Number Rule.',
+                details: 'Weak: "Managed the sales team."<br><b>Strong:</b> "Managed a team of 12 sales executives, achieving 20% year-on-year revenue growth."'
+            },
+
+            // --- INTERVIEW MASTERY ---
+            {
+                id: 4, category: 'Interview', title: 'The STAR+ Method', icon: '🌟',
+                desc: 'The elite way to answer behavioral questions.',
+                details: '<b>STAR:</b> Situation, Task, Action, Result.<br><b>The Plus (+):</b> Add a "Reflection" or "Learning" at the end. "What I learned from this was..." This shows high Emotional Intelligence (EQ).'
+            },
+            {
+                id: 5, category: 'Interview', title: 'Reverse Interviewing', icon: '🔄',
+                desc: 'Asking power questions determines your status.',
+                details: '<b>Culture:</b> "How does leadership handle failure?"<br><b>Expectation:</b> "What is the single most important thing I should achieve in my first 90 days?"'
+            },
+            {
+                id: 6, category: 'Interview', title: 'Salary Deflection', icon: '💰',
+                desc: 'Never be the first to give a number.',
+                details: 'Use <b>Deflection:</b> "I\'m more interested in the fit right now. What range have you budgeted for this?" Research via Glassdoor and Payscale before walking in.'
+            },
+
+            // --- NETWORKING ---
+            {
+                id: 7, category: 'Network', title: 'Lead Generation on LinkedIn', icon: '📱',
+                desc: '80% of jobs are in the Hidden Job Market.',
+                details: '<b>Headline:</b> Use keywords like "Full Stack Developer | React | Node.js" instead of "Looking for opportunities."<br><b>Content:</b> Post once a week about a challenge you solved to position yourself as an authority.'
+            },
+            {
+                id: 8, category: 'Network', title: 'Warm Outreach Strategy', icon: '☕',
+                desc: 'Ask for advice, not for a job.',
+                details: '<b>Script:</b> "Hi [Name], I\'ve been following your work. I\'m pivoting into this space and would love to ask 3 brief questions about your journey. 10 mins for a virtual coffee?"'
+            },
+
+            // --- STUDY GUIDES (NEW) ---
+            {
+                id: 9, category: 'Study', title: 'Active Recall for Professionals', icon: '🧠',
+                desc: 'Don\'t just read. Test yourself for long-term retention.',
+                details: 'When preparing for professional certifications, use flashcards or practice papers. Testing your brain forces it to retrieve data, strengthening neural pathways far better than passive reading.'
+            },
+            {
+                id: 10, category: 'Study', title: 'Strategic Certification', icon: '🏆',
+                desc: 'Don\'t just collect certificates; be strategic.',
+                details: 'Choose highly in-demand credentials: <b>PMP</b> for managers, <b>AWS/Azure</b> for Tech, <b>ACCA/CIMA</b> for Finance. Ensure the certification validates a skill that companies are actively hiring for.'
+            },
+            {
+                id: 11, category: 'Study', title: 'The 80/20 Learning Rule', icon: '📈',
+                desc: 'Focus 80% energy on the 20% most vital material.',
+                details: 'Identify the core concepts most likely to appear in exams or workplace scenarios. Mastery of these fundamentals is more valuable than a shallow understanding of everything.'
+            },
+            {
+                id: 12, category: 'Study', title: 'Build While You Learn', icon: '🏗️',
+                desc: 'Prove you can apply theory to real-world problems.',
+                details: 'If learning Data Analysis or Code, create a small portfolio project simultaneously. This "Proof of Work" is more convincing to recruiters than any piece of paper.'
+            },
+
+            // --- MENTAL GAME & BRAND ---
+            {
+                id: 13, category: 'All', title: 'The T-Shaped Skillset', icon: '🧱',
+                desc: 'The structure of an irreplaceable professional.',
+                details: '<b>Broad Skills:</b> Basic understanding of Marketing, Finance, and Tech.<br><b>Deep Skills:</b> Absolute expertise in one specific niche. This makes you rare and high-value.'
+            },
+            {
+                id: 14, category: 'All', title: 'The 5-a-Day Rule', icon: '🎯',
+                desc: 'Quality over quantity in job applications.',
+                details: 'Don\'t apply to 50 jobs poorly. Apply to 5 jobs with high-quality, tailored applications. Personalization beats mass-application every single time.'
+            },
+            {
+                id: 15, category: 'All', title: 'Handling Rejection', icon: '🛡️',
+                desc: 'Every "No" is data for your next "Yes".',
+                details: 'Ask for feedback. If no interviews: Your <b>Resume</b> is the problem. If no offers: Your <b>Interviewing</b> skills are the problem. Analyze, improve, and move on.'
+            }
+        ];
+
+        function renderGuides(filter = 'All') {
+            const grid = document.getElementById('guideGrid');
+            grid.innerHTML = '';
+            const filtered = filter === 'All' ? studyGuides : studyGuides.filter(g => g.category === filter);
+
+            filtered.forEach(guide => {
+                const card = document.createElement('div');
+                card.className = 'guide-card bg-white rounded-[2.5rem] p-8 cursor-pointer flex flex-col h-full';
+                card.onclick = () => openModal(guide);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="w-14 h-14 bg-indigo-50 text-3xl flex items-center justify-center rounded-2xl">
+                            ${guide.icon}
+                        </div>
+                        <span class="text-[9px] font-black uppercase text-slate-400 border border-slate-100 px-2 py-1 rounded-lg">${guide.category}</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">${guide.title}</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">${guide.desc}</p>
+                    </div>
+                    <div class="mt-8 flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-widest">
+                        <span>Read Strategy</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(cat) {
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                const btnText = btn.innerText;
+                const isActive = (cat === 'All' && btnText === 'All Strategies') || 
+                                 (cat === 'Resume' && btnText === 'Resume Engineering') || 
+                                 (cat === 'Interview' && btnText === 'Interview Mastery') || 
+                                 (cat === 'Network' && btnText === 'Networking') || 
+                                 (cat === 'Study' && btnText === 'Study Guides');
+                btn.classList.toggle('active', isActive);
+            });
+            renderGuides(cat);
+        }
+
+        function openModal(guide) {
+            const modal = document.getElementById('modal');
+            document.getElementById('modalHeader').innerHTML = `
+                <div class="w-12 h-12 bg-indigo-50 text-2xl rounded-2xl flex items-center justify-center">${guide.icon}</div>
+                <div>
+                    <span class="text-xs font-black uppercase text-indigo-500 tracking-[4px] block">${guide.category} Module</span>
+                    <span class="text-[9px] text-slate-400 font-bold">Career Success Guide v5.0</span>
+                </div>
+            `;
+            document.getElementById('modalTitle').innerText = guide.title;
+            document.getElementById('modalContent').innerHTML = `<div class="prose prose-indigo prose-lg text-slate-600 max-w-none">${guide.details}</div>`;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Init with All
+        renderGuides('All');
+    </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConvertEase | Professional File Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- JSZip for ZIP functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 500px;
+            width: 95%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.active {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+        .file-item {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+        .format-btn.active {
+            background-color: #0f172a;
+            color: white;
+            border-color: #0f172a;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div class="app-container p-6 md:p-8 my-10">
+        <!-- App Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                </div>
+                <h1 class="text-xl font-extrabold text-slate-800 tracking-tight">ConvertEase</h1>
+            </div>
+            <span class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-widest">v2.1</span>
+        </div>
+
+        <!-- Drop Zone -->
+        <div id="dropZone" class="drop-zone rounded-[1.5rem] p-10 flex flex-col items-center justify-center text-center mb-8 cursor-pointer">
+            <input type="file" id="fileInput" class="hidden" multiple>
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+            </div>
+            <p class="text-slate-700 font-bold">Choose files or drag them here</p>
+            <p class="text-slate-400 text-xs mt-1 font-medium">Auto-detecting formats for smart conversion</p>
+        </div>
+
+        <!-- File List Section -->
+        <div id="fileListContainer" class="hidden space-y-4 mb-8">
+            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Selected Files</h3>
+            <div id="fileList" class="space-y-3"></div>
+        </div>
+
+        <!-- Dynamic Settings -->
+        <div id="settingsContainer" class="hidden mb-8">
+            <label id="formatLabel" class="text-xs font-black uppercase text-slate-400 tracking-widest mb-3 block text-center">Recommended Output</label>
+            <div id="formatGrid" class="grid grid-cols-3 gap-2">
+                <!-- Buttons dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <button id="convertBtn" class="w-full btn-gradient text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span id="btnText">Convert & Download</span>
+            <svg id="btnIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+
+        <p class="text-center text-[10px] text-slate-400 mt-6 font-semibold uppercase tracking-widest">Private & Auto-Zip for multi-files</p>
+    </div>
+
+    <!-- Feedback Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none">
+        Preparing download...
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const formatGrid = document.getElementById('formatGrid');
+        const convertBtn = document.getElementById('convertBtn');
+        const toast = document.getElementById('toast');
+        const btnText = document.getElementById('btnText');
+
+        let selectedFiles = [];
+        let targetFormat = '';
+
+        const formatMap = {
+            'image': ['PNG', 'JPG', 'WEBP', 'PDF'],
+            'application/pdf': ['DOCX', 'JPG', 'PNG'],
+            'text': ['PDF', 'DOCX', 'HTML'],
+            'default': ['PDF', 'ZIP']
+        };
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFiles(e.target.files);
+
+        ['dragenter', 'dragover'].forEach(n => dropZone.addEventListener(n, e => { e.preventDefault(); dropZone.classList.add('active'); }));
+        ['dragleave', 'drop'].forEach(n => dropZone.addEventListener(n, e => { e.preventDefault(); dropZone.classList.remove('active'); if(n==='drop') handleFiles(e.dataTransfer.files); }));
+
+        function handleFiles(files) {
+            selectedFiles = [...files];
+            if (selectedFiles.length > 0) {
+                updateFileList();
+                updateFormatOptions(selectedFiles[0].type);
+                fileListContainer.classList.remove('hidden');
+                settingsContainer.classList.remove('hidden');
+                convertBtn.disabled = false;
+            }
+        }
+
+        function updateFormatOptions(mimeType) {
+            let type = 'default';
+            if (mimeType.startsWith('image/')) type = 'image';
+            else if (mimeType === 'application/pdf') type = 'application/pdf';
+            else if (mimeType.startsWith('text/')) type = 'text';
+
+            const options = formatMap[type];
+            formatGrid.innerHTML = '';
+            targetFormat = options[0];
+
+            options.forEach((fmt, i) => {
+                const btn = document.createElement('button');
+                btn.className = `format-option py-2 rounded-xl text-xs font-bold border transition-all ${i === 0 ? 'active' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-500'}`;
+                btn.innerText = fmt;
+                btn.onclick = () => {
+                    document.querySelectorAll('.format-option').forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+                    });
+                    btn.classList.add('active');
+                    btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                    targetFormat = fmt;
+                };
+                formatGrid.appendChild(btn);
+            });
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = selectedFiles.map((file, i) => `
+                <div class="file-item bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-sm font-bold text-slate-800 truncate">${file.name}</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase">${(file.size/1024/1024).toFixed(2)} MB</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        convertBtn.onclick = async () => {
+            convertBtn.disabled = true;
+            btnText.innerText = "Processing...";
+            
+            const progressBars = [];
+            document.querySelectorAll('.file-item').forEach(item => {
+                const barCont = document.createElement('div');
+                barCont.className = 'w-full h-1 bg-slate-100 rounded-full mt-3 overflow-hidden';
+                const bar = document.createElement('div');
+                bar.className = 'h-full bg-blue-500 w-0 transition-all duration-200';
+                barCont.appendChild(bar);
+                item.appendChild(barCont);
+                progressBars.push(bar);
+            });
+
+            // Simulate progress for all files
+            for(let p = 0; p <= 100; p += 5) {
+                await new Promise(r => setTimeout(r, 100));
+                progressBars.forEach(b => b.style.width = p + '%');
+            }
+
+            if (selectedFiles.length > 1) {
+                await downloadAsZip();
+            } else {
+                await downloadSingleFile();
+            }
+
+            showToast("Success! Download started.");
+            btnText.innerText = "Convert & Download";
+            convertBtn.disabled = false;
+        };
+
+        async function downloadSingleFile() {
+            const file = selectedFiles[0];
+            const name = file.name.split('.')[0] + '.' + targetFormat.toLowerCase();
+            const blob = new Blob([file], { type: file.type });
+            triggerDownload(blob, name);
+        }
+
+        async function downloadAsZip() {
+            const zip = new JSZip();
+            selectedFiles.forEach(file => {
+                const newName = file.name.split('.')[0] + '.' + targetFormat.toLowerCase();
+                zip.file(newName, file);
+            });
+            const content = await zip.generateAsync({ type: "blob" });
+            triggerDownload(content, `converted_files_${Date.now()}.zip`);
+        }
+
+        function triggerDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

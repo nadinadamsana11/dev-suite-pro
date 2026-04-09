@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptly | Ultimate AI Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .prompt-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .prompt-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05);
+        }
+        .category-pill {
+            transition: all 0.2s ease;
+        }
+        .category-pill.active {
+            background: #4f46e5;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Top Navigation / Header -->
+        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Promptly</h1>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Library v2.0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Input -->
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="searchInput" placeholder="Search prompts..." class="w-full bg-slate-100 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="flex gap-2 mt-6 overflow-x-auto pb-2 custom-scrollbar">
+                    <button onclick="filterPrompts('All')" class="category-pill active shrink-0 px-5 py-2 rounded-full text-xs font-bold bg-white border border-slate-200 hover:border-indigo-300">All</button>
+                    <button onclick="filterPrompts('ChatGPT')" class="category-pill shrink-0 px-5 py-2 rounded-full text-xs font-bold bg-white border border-slate-200 hover:border-indigo-300">ChatGPT</button>
+                    <button onclick="filterPrompts('Midjourney')" class="category-pill shrink-0 px-5 py-2 rounded-full text-xs font-bold bg-white border border-slate-200 hover:border-indigo-300">Midjourney</button>
+                    <button onclick="filterPrompts('Claude')" class="category-pill shrink-0 px-5 py-2 rounded-full text-xs font-bold bg-white border border-slate-200 hover:border-indigo-300">Claude</button>
+                    <button onclick="filterPrompts('Marketing')" class="category-pill shrink-0 px-5 py-2 rounded-full text-xs font-bold bg-white border border-slate-200 hover:border-indigo-300">Marketing</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <div id="promptGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Cards injected by JS -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 text-slate-400">
+                <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="font-medium">No prompts found matching your search.</p>
+            </div>
+        </main>
+
+        <!-- Simple Footer -->
+        <footer class="mt-auto py-8 border-t border-slate-200 bg-white">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">&copy; 2024 Promptly AI Directory • Curated for Professionals</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl text-xs font-bold opacity-0 transition-all duration-300 pointer-events-none z-50 shadow-2xl">
+        Prompt copied to clipboard!
+    </div>
+
+    <script>
+        const prompts = [
+            { id: 1, tool: 'ChatGPT', tag: 'Marketing', title: 'SEO Content Strategist', desc: 'Create a high-ranking blog post structure.', text: 'Act as an SEO expert. Create a detailed blog post outline for the keyword "[TOPIC]". Include LSI keywords, meta description, and H1-H3 headers.' },
+            { id: 2, tool: 'Midjourney', tag: 'Design', title: 'Cyberpunk Cityscape', desc: 'Neon-lit futuristic urban environment.', text: 'Cyberpunk Tokyo street, neon signs, rainy night, cinematic lighting, ultra-detailed, 8k, Unreal Engine 5 render, wide angle --ar 16:9 --v 6.0' },
+            { id: 3, tool: 'Claude', tag: 'Coding', title: 'Python Architect', desc: 'Refactor complex code for performance.', text: 'Analyze this Python code and refactor it for better readability and performance. Use list comprehensions where applicable and add docstrings.' },
+            { id: 4, tool: 'ChatGPT', tag: 'Business', title: 'SaaS Pitch Deck', desc: 'Outline for a winning startup pitch.', text: 'Outline a 10-slide pitch deck for a SaaS startup in the [NICHE] industry. Focus on the problem, solution, and market size.' },
+            { id: 5, tool: 'Midjourney', tag: 'Art', title: 'Whimsical Oil Painting', desc: 'Soft, dreamy classical art style.', text: 'A cat reading a book in a library, whimsical oil painting style, soft brushstrokes, warm candlelight, cozy atmosphere --v 6.0' },
+            { id: 6, tool: 'Claude', tag: 'Writing', title: 'Book Plot Developer', desc: 'Create deep character arcs.', text: 'Develop a 3-act plot structure for a mystery novel set in a small coastal town. Focus on a protagonist with a hidden past.' },
+            { id: 7, tool: 'ChatGPT', tag: 'Marketing', title: 'Ad Copy Generator', desc: 'High-converting Facebook ads.', text: 'Write 3 variations of a Facebook Ad copy for [PRODUCT]. Target audience: [AUDIENCE]. Use the AIDA framework.' },
+            { id: 8, tool: 'Midjourney', tag: 'Design', title: 'App Interface Concept', desc: 'Mobile UI design inspiration.', text: 'Modern fitness app UI design, dark mode, vibrant lime accents, clean typography, high fidelity, trending on Dribbble --ar 9:16' },
+            { id: 9, tool: 'Claude', tag: 'Coding', title: 'API Documentation', desc: 'Auto-generate clean API docs.', text: 'Write comprehensive documentation for this REST API endpoint, including parameters, response types, and error codes.' },
+            { id: 10, tool: 'ChatGPT', tag: 'Business', title: 'Email Cold Outreach', desc: 'Get responses from busy execs.', text: 'Draft a short, personalized cold email to a CEO regarding [OFFER]. Focus on providing value in under 100 words.' },
+            { id: 11, tool: 'Midjourney', tag: 'Art', title: 'Isometric 3D Room', desc: 'Stylized 3D low poly environment.', text: 'Isometric 3D view of a gamer room, low poly style, pastel colors, blender render, high detail, cute aesthetics --v 6.0' },
+            { id: 12, tool: 'Claude', tag: 'Writing', title: 'Legal Document Simplifier', desc: 'Turn jargon into plain English.', text: 'Summarize this legal contract in simple terms. Highlight the key responsibilities and termination clauses for both parties.' },
+            { id: 13, tool: 'ChatGPT', tag: 'Marketing', title: 'YouTube Script Writer', desc: 'Engagement-focused video intro.', text: 'Write a 60-second engaging intro for a YouTube video about [TOPIC]. Hook the audience in the first 5 seconds.' },
+            { id: 14, tool: 'Midjourney', tag: 'Design', title: 'Luxury Logo Mark', desc: 'Minimalist high-end branding.', text: 'Minimalist logo for a luxury watch brand, geometric shape, gold on black background, vector style, symmetrical --v 6.0' },
+            { id: 15, tool: 'Claude', tag: 'Coding', title: 'Unit Test Generator', desc: 'Ensure your code is bug-free.', text: 'Generate a set of unit tests using pytest for the following Python function. Include edge cases.' },
+            { id: 16, tool: 'ChatGPT', tag: 'Business', title: 'Crisis Communication', desc: 'Professional response templates.', text: 'Draft a professional public statement regarding a service outage. Address the cause, the fix, and compensation.' },
+            { id: 17, tool: 'Midjourney', tag: 'Art', title: 'Studio Portrait Photography', desc: 'High-end lighting photography.', text: 'Close up portrait of an elderly man, deep wrinkles, studio lighting, black background, shot on Sony A7R IV, 85mm lens --ar 4:5' },
+            { id: 18, tool: 'Claude', tag: 'Writing', title: 'Poetry Generator', desc: 'Hauntingly beautiful verses.', text: 'Write a sonnet about the intersection of artificial intelligence and human emotion. Use a somber but hopeful tone.' },
+            { id: 19, tool: 'ChatGPT', tag: 'Marketing', title: 'TikTok Content Plan', desc: 'Weekly viral video ideas.', text: 'Give me 5 viral TikTok video ideas for a [NICHE] brand. Include trending audio concepts and captions.' },
+            { id: 20, tool: 'Midjourney', tag: 'Design', title: 'Product Photography', desc: 'Commercial grade product shots.', text: 'Minimalist skincare bottle on a marble slab, water splashes, soft sunlight, professional commercial photography --v 6.0' }
+        ];
+
+        let currentCategory = 'All';
+
+        function renderPrompts(data) {
+            const grid = document.getElementById('promptGrid');
+            const empty = document.getElementById('emptyState');
+            grid.innerHTML = '';
+            
+            if (data.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            data.forEach(prompt => {
+                const card = document.createElement('div');
+                card.className = 'prompt-card bg-white border border-slate-200 rounded-[1.5rem] p-6 flex flex-col h-full';
+                
+                const toolColors = {
+                    'ChatGPT': 'bg-emerald-50 text-emerald-600',
+                    'Midjourney': 'bg-violet-50 text-violet-600',
+                    'Claude': 'bg-amber-50 text-amber-600'
+                };
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${toolColors[prompt.tool] || 'bg-slate-50 text-slate-600'}">
+                            ${prompt.tool}
+                        </span>
+                        <button onclick="copyToClipboard('${prompt.id}')" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        </button>
+                    </div>
+                    <h3 class="font-bold text-slate-900 mb-1 line-clamp-1">${prompt.title}</h3>
+                    <p class="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">${prompt.desc}</p>
+                    <div class="mt-auto">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <p class="text-[11px] font-medium text-slate-600 italic line-clamp-3">"${prompt.text}"</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterPrompts(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                pill.classList.toggle('active', pill.innerText === category);
+            });
+
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            applyFilters(term, category);
+        }
+
+        function applyFilters(term, category) {
+            const filtered = prompts.filter(p => {
+                const matchesSearch = p.title.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term);
+                const matchesCategory = category === 'All' || p.tool === category || p.tag === category;
+                return matchesSearch && matchesCategory;
+            });
+            renderPrompts(filtered);
+        }
+
+        document.getElementById('searchInput').oninput = (e) => {
+            applyFilters(e.target.value.toLowerCase(), currentCategory);
+        };
+
+        function copyToClipboard(id) {
+            const prompt = prompts.find(p => p.id == id);
+            const el = document.createElement('textarea');
+            el.value = prompt.text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, -20px)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 2000);
+        }
+
+        // Initial render
+        renderPrompts(prompts);
+    </script>
+</body>
+</html>

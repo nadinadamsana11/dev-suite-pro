@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterviewPro | Ultimate Career Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .stage-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -12px rgba(37, 99, 235, 0.12);
+            border-color: #bfdbfe;
+        }
+        .nav-pill {
+            transition: all 0.3s ease;
+        }
+        .nav-pill.active {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25);
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 5px;
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .prose b { color: #1e293b; font-weight: 700; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen flex flex-col max-w-6xl mx-auto bg-white shadow-xl">
+        <!-- Header Section -->
+        <header class="sticky top-0 z-40 glass-header px-6 py-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">InterviewPro</h1>
+                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Master Your Career Journey</p>
+                    </div>
+                </div>
+                
+                <!-- Stage Navigation -->
+                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
+                    <button onclick="filterStage('All')" class="nav-pill active shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">All Tips</button>
+                    <button onclick="filterStage('Resume')" class="nav-pill shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Resume</button>
+                    <button onclick="filterStage('Interview')" class="nav-pill shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Interview</button>
+                    <button onclick="filterStage('Networking')" class="nav-pill shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Networking</button>
+                    <button onclick="filterStage('Growth')" class="nav-pill shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition-all">Personal Brand</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow p-6 md:p-8 bg-slate-50/50">
+            <div id="tipsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tips will be injected here -->
+            </div>
+        </main>
+
+        <!-- Simple Footer -->
+        <footer class="p-8 border-t border-slate-100 text-center bg-white">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[5px]">Success is where preparation meets opportunity</p>
+        </footer>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all">
+            <div class="p-8 md:p-10">
+                <div id="modalHeader" class="flex items-center gap-3 mb-6">
+                    <!-- Icon injected here -->
+                </div>
+                <h2 id="modalTitle" class="text-2xl font-extrabold text-slate-900 mb-4 leading-tight"></h2>
+                <div id="modalContent" class="text-slate-600 leading-relaxed text-sm md:text-base space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Content injected here -->
+                </div>
+                <button onclick="closeModal()" class="mt-8 w-full bg-blue-600 text-white py-4 rounded-2xl font-bold transition-all hover:bg-blue-700 shadow-lg shadow-blue-100">Got it, Let's Master it!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tipsData = [
+            // --- RESUME ENGINEERING ---
+            {
+                id: 1, stage: 'Resume', title: 'ATS Optimization', icon: '🤖',
+                desc: 'Beat the algorithm before reaching the human recruiter.',
+                details: '<b>Keyword Optimization:</b> Mirror terminology from the job description. If they ask for "Customer Relationship Management," write it in full rather than just "CRM." <b>Simple Formatting:</b> Avoid tables, headers, or complex graphics that might confuse ATS bots. Save your file as "FirstName_LastName_Role.pdf".'
+            },
+            {
+                id: 2, stage: 'Resume', title: 'The Professional Profile', icon: '✍️',
+                desc: 'Replace the "Objective" with a high-impact hook.',
+                details: 'Define who you are, your biggest achievement, and the value you bring in 3-4 lines. <b>Example:</b> "Results-driven Project Manager with 8+ years experience leading cross-functional teams to deliver $2M+ tech projects 15% under budget."'
+            },
+            {
+                id: 3, stage: 'Resume', title: 'Quantifying Impact', icon: '📊',
+                desc: 'Use numbers to prove your success.',
+                details: 'Don\'t just list duties; list outcomes. Instead of "Managed a sales team," use: "Managed a team of 12 sales executives, achieving 20% year-on-year revenue growth and reducing client churn by 10%."'
+            },
+
+            // --- INTERVIEW MASTERY ---
+            {
+                id: 4, stage: 'Interview', title: 'The STAR+ Method', icon: '🌟',
+                desc: 'Go beyond the standard STAR technique.',
+                details: 'Add a <b>"Reflection"</b> at the end of your story. Say: "What I learned from this was..." This demonstrates high emotional intelligence (EQ) and a growth mindset, which elite recruiters look for.'
+            },
+            {
+                id: 5, stage: 'Interview', title: 'Reverse Interviewing', icon: '🔄',
+                desc: 'Ask power questions to show your strategy.',
+                details: '<b>Culture:</b> "How does leadership handle failure?" <b>Expectation:</b> "What is the single most important thing I should achieve in my first 90 days?" <b>Strategy:</b> "I noticed the recent expansion into [Market X], how does this role support that?"'
+            },
+            {
+                id: 6, stage: 'Interview', title: 'Salary Defense', icon: '💰',
+                desc: 'Never be the first to give a number.',
+                details: 'Use <b>Deflection:</b> "I\'m more interested in the fit right now. What range have you budgeted for this?" Always research your market value via Glassdoor or LinkedIn Salary insights before walking in.'
+            },
+            {
+                id: 7, stage: 'Interview', title: 'The First 5 Minutes', icon: '⏱️',
+                desc: 'Master the science of first impressions.',
+                details: 'Smile, use the interviewer\'s name, and maintain confident posture. Professionalism starts the second you enter the building or the virtual lobby. First impressions are often permanent.'
+            },
+
+            // --- NETWORKING ---
+            {
+                id: 8, stage: 'Networking', title: 'The Hidden Job Market', icon: '🕵️',
+                desc: 'Find the 80% of jobs that aren\'t posted.',
+                details: 'Most jobs are filled via networking. Don\'t just apply online; reach out to employees in your target department for informational interviews. This is the "side door" to high-paying roles.'
+            },
+            {
+                id: 9, stage: 'Networking', title: 'LinkedIn Content Strategy', icon: '📱',
+                desc: 'Position yourself as an authority.',
+                details: 'Your headline should be keyword-rich (e.g., "Full Stack Developer | React, Node.js, AWS"). Post weekly about a professional challenge you solved to build a brand that attracts recruiters.'
+            },
+            {
+                id: 10, stage: 'Networking', title: 'Warm Outreach Script', icon: '☕',
+                desc: 'Ask for advice, not for a job.',
+                details: 'Script: "Hi [Name], I\'ve been following your work in [Industry]. I\'m currently pivoting and would love to ask 3 brief questions about your journey. Would you have 10 mins for a virtual coffee?"'
+            },
+
+            // --- GROWTH & BRANDING ---
+            {
+                id: 11, stage: 'Growth', title: 'T-Shaped Skillset', icon: '🏗️',
+                desc: 'Become irreplaceable in your field.',
+                details: '<b>Broad Skills:</b> Understand Marketing, Finance, and Tech basics. <b>Deep Skills:</b> Be an absolute expert in one specific niche. This combination makes you a high-value asset in any organization.'
+            },
+            {
+                id: 12, stage: 'Growth', title: 'Emotional Intelligence (EQ)', icon: '🧠',
+                desc: 'People skills matter more as you rise.',
+                details: 'Practice active listening and focus on problem-solving rather than blaming. High EQ is the primary trait found in senior leadership and executive roles.'
+            },
+            {
+                id: 13, stage: 'Growth', title: 'Navigating Career Gaps', icon: '🌉',
+                desc: 'Frame gaps as periods of growth.',
+                details: 'Be honest but brief. Focus on what you did (Learning, freelancing, family) and emphasize that you are returning with full focus and refreshed energy. Transferable skills are key here.'
+            },
+            {
+                id: 14, stage: 'Growth', title: 'The 5-a-Day Rule', icon: '🎯',
+                desc: 'Quality over quantity in job hunting.',
+                details: 'Don\'t apply to 50 jobs poorly. Apply to 5 jobs with high-quality, tailored resumes and cover letters. Personalization beats mass-application every single time.'
+            },
+            {
+                id: 15, stage: 'Growth', title: 'Handling Rejection', icon: '🛡️',
+                desc: 'Turn "No" into valuable data.',
+                details: 'Ask for feedback: "Is there any specific area you suggest I improve?" If no interviews, your resume is the issue. If no offers, your interviewing skills need work. Use rejection to refine your strategy.'
+            }
+        ];
+
+        function renderTips(filter = 'All') {
+            const grid = document.getElementById('tipsGrid');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'All' ? tipsData : tipsData.filter(t => t.stage === filter);
+
+            filtered.forEach(tip => {
+                const card = document.createElement('div');
+                card.className = 'stage-card bg-white border border-slate-200 rounded-3xl p-6 cursor-pointer flex flex-col h-full group';
+                card.onclick = () => openModal(tip);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-50 text-2xl flex items-center justify-center rounded-2xl">
+                            ${tip.icon}
+                        </div>
+                        <span class="text-[9px] font-black uppercase text-slate-400 border border-slate-100 px-2 py-1 rounded-lg">${tip.stage}</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">${tip.title}</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">${tip.desc}</p>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[10px] font-black uppercase text-blue-600 tracking-widest">Master Strategy</span>
+                        <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterStage(stage) {
+            document.querySelectorAll('.nav-pill').forEach(btn => {
+                const btnText = btn.innerText;
+                const isActive = (stage === 'All' && btnText === 'All Tips') || 
+                                 (stage === 'Resume' && btnText === 'Resume') || 
+                                 (stage === 'Interview' && btnText === 'Interview') || 
+                                 (stage === 'Networking' && btnText === 'Networking') || 
+                                 (stage === 'Growth' && btnText === 'Personal Brand');
+                btn.classList.toggle('active', isActive);
+            });
+            renderTips(stage);
+        }
+
+        function openModal(tip) {
+            const modal = document.getElementById('modal');
+            document.getElementById('modalHeader').innerHTML = `
+                <div class="w-12 h-12 bg-blue-50 text-2xl rounded-2xl flex items-center justify-center">${tip.icon}</div>
+                <div>
+                    <span class="text-[10px] font-black uppercase text-blue-500 tracking-[3px] block">${tip.stage} Excellence</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Expert Guide v4.0</span>
+                </div>
+            `;
+            document.getElementById('modalTitle').innerText = tip.title;
+            document.getElementById('modalContent').innerHTML = `<div class="prose prose-slate prose-sm max-w-none text-slate-600">${tip.details}</div>`;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize with All Tips
+        renderTips('All');
+    </script>
+</body>
+</html>
